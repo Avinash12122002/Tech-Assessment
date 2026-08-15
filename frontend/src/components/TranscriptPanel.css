@@ -1,0 +1,119 @@
+.transcript-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.transcript-header {
+  display: none;
+}
+
+.transcript-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 30px;
+}
+
+.transcript-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.transcript-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.transcript-messages::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.transcript-empty {
+  display: none;
+}
+
+.transcript-message {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.message-user {
+  align-self: flex-end;
+  background: white;
+  border-bottom-right-radius: 4px;
+  max-width: 85%;
+}
+
+.message-ai {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom-left-radius: 4px;
+  max-width: 85%;
+}
+
+.message-avatar {
+  display: none;
+}
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-role {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.message-text {
+  margin: 0;
+  font-size: 1rem;
+  color: #334155;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* Thinking dots animation */
+.thinking-dots {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.thinking-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: bounce 1.4s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.thinking-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,65 @@
+.app {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #fdf2f8; /* Soft pink base */
+}
+
+/* Vibrant pastel mesh background */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-gradient {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.7;
+}
+
+.bg-1 {
+  width: 800px;
+  height: 800px;
+  background: #e0e7ff; /* Indigo tint */
+  top: -200px;
+  left: -200px;
+  animation: float 25s ease-in-out infinite;
+}
+
+.bg-2 {
+  width: 700px;
+  height: 700px;
+  background: #fce7f3; /* Pink tint */
+  bottom: -150px;
+  right: -100px;
+  animation: float 28s ease-in-out infinite reverse;
+}
+
+.bg-3 {
+  width: 600px;
+  height: 600px;
+  background: #e0f2fe; /* Light blue tint */
+  top: 40%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+  animation: float 35s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(40px, -40px); }
+  50% { transform: translate(-30px, 30px); }
+  75% { transform: translate(30px, 40px); }
+}
+
+.app-main {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
