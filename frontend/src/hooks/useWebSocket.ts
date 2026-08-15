@@ -1,6 +1,8 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
 import type { ServerEvent } from '../types';
 
+const DEFAULT_RENDER_BACKEND = 'tech-assessment-rwtd.onrender.com';
+
 function getWebSocketUrl(): string {
   let rawUrl = (import.meta.env.VITE_WS_URL as string | undefined)?.trim();
   if (rawUrl) {
@@ -19,13 +21,21 @@ function getWebSocketUrl(): string {
     }
     return rawUrl;
   }
+
   if (import.meta.env.VITE_API_URL) {
     const apiUrl = (import.meta.env.VITE_API_URL as string).trim();
     const wsProto = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
     const host = apiUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
     return `${wsProto}//${host}/ws`;
   }
-  return `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+
+  // If running locally
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'ws://localhost:3001/ws';
+  }
+
+  // Production fallback directly to Render backend
+  return `wss://${DEFAULT_RENDER_BACKEND}/ws`;
 }
 
 const WS_URL = getWebSocketUrl();

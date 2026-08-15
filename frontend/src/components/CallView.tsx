@@ -6,8 +6,18 @@ import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { TranscriptPanel } from './TranscriptPanel';
 import './CallView.css';
 
-const rawApiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || '';
-const API_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
+function getApiUrl(): string {
+  const envUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
+  if (envUrl) {
+    return envUrl.endsWith('/') ? envUrl.slice(0, -1) : envUrl;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:3001';
+  }
+  return 'https://tech-assessment-rwtd.onrender.com';
+}
+
+const API_URL = getApiUrl();
 
 interface CallViewProps {
   onReportReady: (report: HealthReport) => void;
