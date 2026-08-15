@@ -164,10 +164,7 @@ export function CallView({ onReportReady }: CallViewProps) {
       setSessionId(newSessionId);
 
       connect();
-
-      setTimeout(() => {
-        send({ type: 'session:start', sessionId: newSessionId });
-      }, 300);
+      send({ type: 'session:start', sessionId: newSessionId });
     } catch (err: any) {
       setCallStatus('error');
       setErrorMessage(`Failed to start call: ${err.message}`);

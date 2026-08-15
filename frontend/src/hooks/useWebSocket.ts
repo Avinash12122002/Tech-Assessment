@@ -40,7 +40,7 @@ function getWebSocketUrl(): string {
 
 const WS_URL = getWebSocketUrl();
 const RECONNECT_DELAY = 2000;
-const MAX_RECONNECT_ATTEMPTS = 3;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 interface UseWebSocketReturn {
   isConnected: boolean;
@@ -53,6 +53,7 @@ export function useWebSocket(
   onMessage: (event: ServerEvent) => void
 ): UseWebSocketReturn {
   const wsRef = useRef<WebSocket | null>(null);
+  const messageQueueRef = useRef<object[]>([]);
   const reconnectAttempts = useRef(0);
   const onMessageRef = useRef(onMessage);
   const [isConnected, setIsConnected] = useState(false);
@@ -61,17 +62,29 @@ export function useWebSocket(
   onMessageRef.current = onMessage;
 
   const connect = useCallback(() => {
-    // Don't reconnect if already connected
-    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+    // Don't reconnect if already connected or connecting
+    if (wsRef.current?.readyState === WebSocket.OPEN || wsRef.current?.readyState === WebSocket.CONNECTING) {
+      return;
+    }
 
     try {
+      console.log('[WS] Connecting to:', WS_URL);
       const ws = new WebSocket(WS_URL);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('[WS] Connected');
+        console.log('[WS] Connected successfully');
         setIsConnected(true);
         reconnectAttempts.current = 0;
+
+        // Flush all queued messages
+        while (messageQueueRef.current.length > 0) {
+          const msg = messageQueueRef.current.shift();
+          if (msg) {
+            console.log('[WS] Sending queued message:', msg);
+            ws.send(JSON.stringify(msg));
+          }
+        }
       };
 
       ws.onmessage = (event) => {
@@ -109,6 +122,7 @@ export function useWebSocket(
 
   const disconnect = useCallback(() => {
     reconnectAttempts.current = MAX_RECONNECT_ATTEMPTS; // Prevent auto-reconnect
+    messageQueueRef.current = [];
     if (wsRef.current) {
       wsRef.current.close(1000, 'User disconnect');
       wsRef.current = null;
@@ -120,9 +134,13 @@ export function useWebSocket(
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(data));
     } else {
-      console.warn('[WS] Cannot send — not connected');
+      console.log('[WS] Message queued until WebSocket is ready:', data);
+      messageQueueRef.current.push(data);
+      if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
+        connect();
+      }
     }
-  }, []);
+  }, [connect]);
 
   // Cleanup on unmount
   useEffect(() => {
