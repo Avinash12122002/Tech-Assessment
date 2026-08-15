@@ -6,7 +6,8 @@ import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { TranscriptPanel } from './TranscriptPanel';
 import './CallView.css';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+const rawApiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || '';
+const API_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 interface CallViewProps {
   onReportReady: (report: HealthReport) => void;
