@@ -2,11 +2,25 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 import type { ServerEvent } from '../types';
 
 function getWebSocketUrl(): string {
-  if (import.meta.env.VITE_WS_URL) {
-    return import.meta.env.VITE_WS_URL;
+  let rawUrl = (import.meta.env.VITE_WS_URL as string | undefined)?.trim();
+  if (rawUrl) {
+    // Correct accidental double protocols or http(s) prefixes
+    if (rawUrl.startsWith('ws://https://') || rawUrl.startsWith('wss://https://')) {
+      return rawUrl.replace(/^ws(s)?:\/\/https:\/\//, 'wss://');
+    }
+    if (rawUrl.startsWith('ws://http://')) {
+      return rawUrl.replace('ws://http://', 'ws://');
+    }
+    if (rawUrl.startsWith('https://')) {
+      return rawUrl.replace('https://', 'wss://');
+    }
+    if (rawUrl.startsWith('http://')) {
+      return rawUrl.replace('http://', 'ws://');
+    }
+    return rawUrl;
   }
   if (import.meta.env.VITE_API_URL) {
-    const apiUrl = import.meta.env.VITE_API_URL as string;
+    const apiUrl = (import.meta.env.VITE_API_URL as string).trim();
     const wsProto = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
     const host = apiUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
     return `${wsProto}//${host}/ws`;
