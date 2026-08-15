@@ -17,7 +17,23 @@ const server = http.createServer(app);
 // ===== Middleware =====
 
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    
+    // If frontendUrl is '*', allow all
+    if (config.frontendUrl === '*' || config.frontendUrl === '') {
+      return callback(null, true);
+    }
+
+    const allowedOrigins = config.frontendUrl.split(',').map((o) => o.trim());
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Allow Render / Vercel preview domains if applicable
+    return callback(null, true);
+  },
   credentials: true,
 }));
 
