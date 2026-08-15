@@ -1,7 +1,20 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
 import type { ServerEvent } from '../types';
 
-const WS_URL = import.meta.env.VITE_WS_URL || `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+function getWebSocketUrl(): string {
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
+  }
+  if (import.meta.env.VITE_API_URL) {
+    const apiUrl = import.meta.env.VITE_API_URL as string;
+    const wsProto = apiUrl.startsWith('https:') ? 'wss:' : 'ws:';
+    const host = apiUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    return `${wsProto}//${host}/ws`;
+  }
+  return `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+}
+
+const WS_URL = getWebSocketUrl();
 const RECONNECT_DELAY = 2000;
 const MAX_RECONNECT_ATTEMPTS = 3;
 
